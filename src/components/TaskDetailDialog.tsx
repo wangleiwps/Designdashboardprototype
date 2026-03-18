@@ -22,6 +22,18 @@ interface PredictResponse {
   error?: string;
 }
 
+const REMOTE_PREDICT_BASE_URL = "https://c8c95b65.natappfree.cc";
+
+function getPredictEndpoint() {
+  if (typeof window !== "undefined") {
+    const hostname = window.location.hostname;
+    if (hostname === "localhost" || hostname === "127.0.0.1") {
+      return "http://127.0.0.1:5000/predict";
+    }
+  }
+  return `${REMOTE_PREDICT_BASE_URL}/predict`;
+}
+
 export function TaskDetailDialog({ task, onClose }: TaskDetailDialogProps) {
   const [beforeImages, setBeforeImages] = useState<string[]>(task.processingInfo?.beforeImages || []);
   const [afterImages, setAfterImages] = useState<string[]>(task.processingInfo?.afterImages || []);
@@ -72,7 +84,7 @@ export function TaskDetailDialog({ task, onClose }: TaskDetailDialogProps) {
         (async () => {
           const formData = new FormData();
           formData.append("image", file);
-          return fetch("http://127.0.0.1:5000/predict", {
+          return fetch(getPredictEndpoint(), {
             method: "POST",
             body: formData,
           });
